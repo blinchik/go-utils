@@ -1,17 +1,22 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	rsaKey "github/blinchik/go-utils/rsakey"
 	"os"
 )
 
 func main() {
 
-	if *rsaKey.local {
-		keyName := os.Args[1]
+	local := flag.Bool("local", false, "local")
+	flag.Parse()
 
-		rsaKey.savePEMKey(fmt.Sprintf("%s/.ssh/%s.pem", home, keyName), key)
-		rsaKey.savePublicPEMKey(fmt.Sprintf("%s/.ssh/%s.pub", home, keyName), publicKey)
+	if *local {
+		keyName := os.Args[2]
+
+		rsaKey.SavePEMKey(fmt.Sprintf("%s/.ssh/%s.pem", rsaKey.Home, keyName), rsaKey.Key)
+		rsaKey.SavePublicPEMKey(fmt.Sprintf("%s/.ssh/%s.pub", rsaKey.Home, keyName), rsaKey.PublicKey)
 
 	}
 
