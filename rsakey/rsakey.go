@@ -3,10 +3,12 @@ package rsakey
 import (
 	"crypto/rsa"
 	"crypto/x509"
-	"encoding/asn1"
 	"encoding/pem"
 	"fmt"
+	"log"
 	"os"
+
+	"golang.org/x/crypto/ssh"
 )
 
 func SavePEMKey(fileName string, key *rsa.PrivateKey) {
@@ -31,19 +33,17 @@ func SavePEMKey(fileName string, key *rsa.PrivateKey) {
 }
 
 func SavePublicPEMKey(fileName string, pubkey rsa.PublicKey) {
-	asn1Bytes, err := asn1.Marshal(pubkey)
-	checkError(err)
-
-	var pemkey = &pem.Block{
-		Type:  "PUBLIC KEY",
-		Bytes: asn1Bytes,
+	pubN, err := ssh.NewPublicKey(&pubkey)
+	if err != nil {
+		log.Fatal(pub)
 	}
+	pubBytes := ssh.MarshalAuthorizedKey(pubN)
 
 	pemfile, err := os.Create(fileName)
 	checkError(err)
 	defer pemfile.Close()
 
-	err = pem.Encode(pemfile, pemkey)
+	err = pem.Encode(pemfile, pubBytes)
 	checkError(err)
 }
 
@@ -61,14 +61,12 @@ func KeepPEMKey(key *rsa.PrivateKey) []byte {
 }
 
 func KeepPublicPEMKey(pubkey rsa.PublicKey) []byte {
-	asn1Bytes, err := asn1.Marshal(pubkey)
-	checkError(err)
-
-	var pemkey = &pem.Block{
-		Type:  "PUBLIC KEY",
-		Bytes: asn1Bytes,
+	pubN, err := ssh.NewPublicKey(&pubkey)
+	if err != nil {
+		log.Fatal(pub)
 	}
+	pubBytes := ssh.MarshalAuthorizedKey(pubN)
 
-	pub := pem.EncodeToMemory(pemkey)
+	pub := pem.EncodeToMemory(pubBytes)
 	return pub
 }
