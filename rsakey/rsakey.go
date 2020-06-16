@@ -15,17 +15,18 @@ func SavePEMKey(fileName string, key *rsa.PrivateKey) {
 	checkError(err)
 	defer outFile.Close()
 
-	err = os.Chmod(fileName, 0400)
-	if err != nil {
-		fmt.Println(err)
-	}
-
 	var privateKey = &pem.Block{
 		Type:  "PRIVATE KEY",
 		Bytes: x509.MarshalPKCS1PrivateKey(key),
 	}
 
 	err = pem.Encode(outFile, privateKey)
+
+	err = os.Chmod(fileName, 0400)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	checkError(err)
 }
 
