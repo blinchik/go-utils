@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	rsaKey "github/blinchik/go-utils/rsakey"
 	"os"
+
+	rsaKey "github.com/blinchik/go-utils/rsakey"
 )
 
 func main() {

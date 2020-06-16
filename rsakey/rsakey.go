@@ -1,46 +1,15 @@
-package rsa-key
+package rsakey
 
 import (
-	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/asn1"
 	"encoding/pem"
-	"flag"
 	"fmt"
 	"os"
 )
 
-func main() {
-
-	local := flag.Bool("local", false, "local")
-	flag.Parse()
-
-	reader := rand.Reader
-	bitSize := 4096
-
-	home, err := os.UserHomeDir()
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	key, err := rsa.GenerateKey(reader, bitSize)
-	checkError(err)
-
-	publicKey := key.PublicKey
-
-	if *local {
-		keyName := os.Args[1]
-
-		savePEMKey(fmt.Sprintf("%s/.ssh/%s.pem", home, keyName), key)
-		savePublicPEMKey(fmt.Sprintf("%s/.ssh/%s.pub", home, keyName), publicKey)
-
-	}
-
-}
-
-func savePEMKey(fileName string, key *rsa.PrivateKey) {
+func SavePEMKey(fileName string, key *rsa.PrivateKey) {
 
 	outFile, err := os.Create(fileName)
 	checkError(err)
@@ -60,7 +29,7 @@ func savePEMKey(fileName string, key *rsa.PrivateKey) {
 	checkError(err)
 }
 
-func savePublicPEMKey(fileName string, pubkey rsa.PublicKey) {
+func SavePublicPEMKey(fileName string, pubkey rsa.PublicKey) {
 	asn1Bytes, err := asn1.Marshal(pubkey)
 	checkError(err)
 
@@ -77,7 +46,7 @@ func savePublicPEMKey(fileName string, pubkey rsa.PublicKey) {
 	checkError(err)
 }
 
-func keepPEMKey(key *rsa.PrivateKey) []byte {
+func KeepPEMKey(key *rsa.PrivateKey) []byte {
 
 	var privateKey = &pem.Block{
 		Type:  "PRIVATE KEY",
@@ -90,7 +59,7 @@ func keepPEMKey(key *rsa.PrivateKey) []byte {
 
 }
 
-func keepPublicPEMKey(pubkey rsa.PublicKey) []byte {
+func KeepPublicPEMKey(pubkey rsa.PublicKey) []byte {
 	asn1Bytes, err := asn1.Marshal(pubkey)
 	checkError(err)
 
@@ -101,11 +70,4 @@ func keepPublicPEMKey(pubkey rsa.PublicKey) []byte {
 
 	pub := pem.EncodeToMemory(pemkey)
 	return pub
-}
-
-func checkError(err error) {
-	if err != nil {
-		fmt.Println("Fatal error ", err.Error())
-		os.Exit(1)
-	}
 }
