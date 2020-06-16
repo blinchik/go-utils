@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -35,16 +36,16 @@ func SavePEMKey(fileName string, key *rsa.PrivateKey) {
 func SavePublicPEMKey(fileName string, pubkey rsa.PublicKey) {
 	pubN, err := ssh.NewPublicKey(&pubkey)
 	if err != nil {
-		log.Fatal(pub)
+		log.Fatal(pubN)
 	}
 	pubBytes := ssh.MarshalAuthorizedKey(pubN)
 
-	pemfile, err := os.Create(fileName)
-	checkError(err)
-	defer pemfile.Close()
+	// write the whole body at once
+	err = ioutil.WriteFile(fileName, pubBytes, 0640)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	err = pem.Encode(pemfile, pubBytes)
-	checkError(err)
 }
 
 func KeepPEMKey(key *rsa.PrivateKey) []byte {
@@ -63,10 +64,9 @@ func KeepPEMKey(key *rsa.PrivateKey) []byte {
 func KeepPublicPEMKey(pubkey rsa.PublicKey) []byte {
 	pubN, err := ssh.NewPublicKey(&pubkey)
 	if err != nil {
-		log.Fatal(pub)
+		log.Fatal(pubN)
 	}
 	pubBytes := ssh.MarshalAuthorizedKey(pubN)
 
-	pub := pem.EncodeToMemory(pubBytes)
-	return pub
+	return pubBytes
 }
